@@ -15,7 +15,7 @@ const Footer = () => {
       }}
     >
       <Typography variant="body2">
-        &copy; {new Date().getFullYear()} FullSend. All rights reserved.{" "}
+        &copy; {new Date().getFullYear()} GodlyRoll. All rights reserved.{" "}
         <Link href="/terms" color="inherit">
           Terms
         </Link>{" "}
