@@ -1,60 +1,39 @@
 import React from "react";
-import Box from "@material-ui/core/Box";
-import { makeStyles } from "@material-ui/core";
-import Container from "@material-ui/core/Container";
+import { Typography, Box, Button } from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
-const useStyles = makeStyles({
-    root: {
-        display: 'flex',
-        width: "100%",
-        flexDirection: 'column',
-        height: '40rem',
-        alignItems: 'center',
-        justifyContent: 'center',
-        color: "#9d9d9d",
-        fontFamily: "Poppins",
-        fontSize: "14px",
-        fontWeight: 400,
-        letterSpacing: ".005em",
-    },
-    container: {
-        display: 'flex',
-        width: "100%",
-        flexDirection: 'column',
-        justifyContent: 'center',
-        margin: "0 auto",
-        alignItems: 'center',
-        color: "#9d9d9d",
-        fontFamily: "Poppins",
-        fontSize: "15px",
-        fontWeight: 400,
-        letterSpacing: ".005em",
-        '& img': {
-            width: '10rem',
-            marginBottom: '1rem',
-        },
-        '& h1': {
-            color: "#b9b9b9",
-            fontFamily: "Poppins",
-            fontSize: "50px",
-            fontWeight: 500,
-            letterSpacing: ".1em",
-            margin: 0,
-        }
-    }
-});
+const NotFound = () => {
+  const navigate = useNavigate();
 
-const Err = () => {
-
-    const classes = useStyles();
-
-    return (
-        <Box className={classes.root}>
-            <Container className={classes.container}>
-                <span><b>404 error</b>. Page not found :(</span>
-            </Container>
-        </Box>
-    );
+  return (
+    <Box
+      sx={{
+        height: "100vh",
+        display: "flex",
+        flexDirection: "column",
+        alignItems: "center",
+        justifyContent: "center",
+        backgroundColor: "#0E0F15",
+        color: "white",
+        textAlign: "center",
+        px: 2,
+      }}
+    >
+      <Typography variant="h1" sx={{ fontSize: 100, fontWeight: "bold" }}>
+        404
+      </Typography>
+      <Typography variant="h5" sx={{ mb: 3 }}>
+        Page Not Found
+      </Typography>
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={() => navigate("/home")}
+      >
+        Go Home
+      </Button>
+    </Box>
+  );
 };
 
-export default Err;
+export default NotFound;
