@@ -1,24 +1,19 @@
 import React, { useState, useEffect } from "react";
-import { BrowserRouter as Router, Switch, Route, Redirect } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
 import CssBaseline from "@mui/material/CssBaseline";
-import Drawer from "@mui/material/Drawer"; // MUI v5
-import { styled } from "@mui/material/styles"; // replaces makeStyles
-import { getSiteSchema } from "./services/api.service";
-
+import Drawer from "@mui/material/Drawer";
+import { styled } from "@mui/material/styles";
+import { Toaster } from "react-hot-toast";
 import { Provider } from "react-redux";
 import store from "./store";
 import { loadUser } from "./actions/auth";
 import EventHandler from "./EventHandler";
-import { motion } from "framer-motion";
-import { Toaster } from "react-hot-toast"; // replaced react-toast-notifications
-import BackgroundImage from "./assets/background.png";
-
-// Components
+import { getSiteSchema } from "./services/api.service";
 import Navbar from "./components/app/Navbar";
-import NotFound from "./components/app/404";
 import Sidebar from "./components/app/Sidebar";
 import Chat from "./components/chat/Chat";
 import Preloader from "./Preloader";
+import BackgroundImage from "./assets/background.png";
 
 // Views
 import Home from "./views/Home";
@@ -32,13 +27,10 @@ import Cases from "./views/Cases";
 import CasePage from "./views/CasePage";
 import Roulette from "./views/Roulette";
 import Crash from "./views/Crash";
-import Limbo from "./views/Limbo";
-import Dice from "./views/Dice";
 import Mines from "./views/Mines";
 import Slots from "./views/Slots";
 import SlotDetail from "./views/SlotDetail";
 import Marketplace from "./views/Marketplace";
-
 import Login from "./views/Login";
 import Leaderboard from "./views/Leaderboard";
 import Provablyfair from "./views/ProvablyFair";
@@ -46,26 +38,23 @@ import Banned from "./views/Banned";
 import AffiliatesRedirect from "./views/AffiliatesRedirect";
 import Maintenance from "./views/Maintenance";
 
-// App Metadata
 import metadata from "./metadata.json";
 
-// ========================= Styled Components =========================
-const Root = styled("div")(({ theme }) => ({
+const RootContainer = styled("div")({
   backgroundColor: "#0D0F13",
   fontFamily: "Poppins",
   display: "flex",
   flexDirection: "column",
   height: "100%",
-}));
+});
 
-const Body = styled("main")({
+const MainBody = styled("main")({
   display: "flex",
   flex: "1 1 auto",
   position: "relative",
-  height: "100%",
 });
 
-const Content = styled("div")(({ theme }) => ({
+const ContentWrapper = styled("div")(({ theme }) => ({
   flexGrow: 1,
   padding: "2rem 1rem",
   overflowY: "auto",
@@ -74,103 +63,72 @@ const Content = styled("div")(({ theme }) => ({
   backgroundSize: "cover",
   backgroundPosition: "center center",
   backgroundBlendMode: "overlay",
-  [theme.breakpoints.down("md")]: { margin: 0 },
-  [theme.breakpoints.down("xs")]: { padding: "1rem" },
+  [theme.breakpoints.down("md")]: {
+    margin: 0,
+  },
+  [theme.breakpoints.down("xs")]: {
+    padding: "1rem",
+  },
 }));
 
 const drawerStyles = {
-  drawerPaperMinimized: {
-    zIndex: 1000,
-    borderRight: "1px solid #282A3A",
-    height: "100%",
+  minimized: {
     width: 80,
     padding: "1rem",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    backgroundColor: "#14151D",
   },
-  drawerPaperExpanded: {
-    zIndex: 1000,
-    borderRight: "1px solid #282A3A",
-    height: "100%",
+  expanded: {
     width: 222,
     padding: "1rem",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    backgroundColor: "#14151D",
   },
-  drawerPaperFull: {
-    zIndex: 2,
-    height: "100%",
-    padding: "1rem",
-    display: "flex",
-    flexDirection: "column",
-    backgroundImage: `url(${BackgroundImage})`,
-    backgroundSize: "cover",
-    backgroundPosition: "center center",
-    backgroundBlendMode: "overlay",
-    borderLeft: "1px solid #282A3A",
+  full: {
     width: 300,
+    padding: "1rem",
   },
 };
 
-// ========================= App Component =========================
 const App = () => {
   const [isSidebarMinimized, setSidebarMinimized] = useState(false);
-  const [open, setOpen] = useState(false);
-  const [mobileChat, setMobile] = useState(false);
   const [finalCountdown, setFinalCountdown] = useState(0);
-
   const [loading, setLoading] = useState(true);
   const [maintenance, setMaintenance] = useState(false);
-  const [isChatVisible, setChatVisible] = useState(true);
+  const [chatVisible, setChatVisible] = useState(true);
 
   const toggleSidebar = () => setSidebarMinimized(!isSidebarMinimized);
-  const toggleChat = () => setChatVisible(!isChatVisible);
 
   const fetchData = async () => {
     setLoading(true);
     await new Promise((resolve) => {
-      let secunde = 1;
-      setFinalCountdown(secunde);
-      let int = setInterval(() => {
-        secunde -= 1;
-        setFinalCountdown(secunde);
-        if (secunde <= 0) {
-          clearInterval(int);
+      let sec = 1;
+      setFinalCountdown(sec);
+      let interval = setInterval(() => {
+        sec -= 1;
+        setFinalCountdown(sec);
+        if (sec <= 0) {
+          clearInterval(interval);
           setFinalCountdown("");
           resolve();
         }
       }, 1300);
     });
-
     try {
       const schema = await getSiteSchema();
       if (schema.maintenanceEnabled) setMaintenance(true);
       setLoading(false);
-    } catch (error) {
-      if (error.response && error.response.status === 503) {
+    } catch (err) {
+      if (err.response && err.response.status === 503) {
         setMaintenance(true);
         setLoading(false);
       } else {
-        console.log(error);
+        console.error(err);
         window.location.reload();
       }
     }
   };
 
   useEffect(() => {
-    const buildId = metadata.build;
-    const buildNumber = buildId.split("@")[1] || "Unknown";
-    console.warn(
-      `%cStop!%c BUILD: ${buildNumber}`,
-      "font-weight:bold;font-size:30px;color:red",
-      "color:black;margin-top:1rem"
-    );
     store.dispatch(loadUser());
     fetchData();
+    // eslint-disable-next-line
   }, []);
 
   useEffect(() => {
@@ -188,68 +146,64 @@ const App = () => {
   return (
     <Provider store={store}>
       <Router>
-        <Toaster position="bottom-left" reverseOrder={false} />
+        <Toaster position="bottom-left" />
 
-        <Root>
+        <RootContainer>
           <CssBaseline />
-          <Navbar style={{ zIndex: 3 }} toggleChat={toggleChat} />
+          <Navbar toggleChat={() => setChatVisible(!chatVisible)} />
 
-          <Body>
+          <MainBody>
             <Drawer
               variant="permanent"
               PaperProps={{
                 sx: isSidebarMinimized
-                  ? drawerStyles.drawerPaperMinimized
-                  : drawerStyles.drawerPaperExpanded,
+                  ? drawerStyles.minimized
+                  : drawerStyles.expanded,
               }}
             >
               <Sidebar isMinimized={isSidebarMinimized} />
-              <div
-                style={{ position: "absolute", top: 10, right: 10, cursor: "pointer" }}
-                onClick={toggleSidebar}
-              >
+              <div onClick={toggleSidebar} style={{ cursor: "pointer" }}>
                 {isSidebarMinimized ? ">" : "<"}
               </div>
             </Drawer>
 
-            <Content>
-              <Switch>
-                <Redirect exact from="/" to="home" />
-                <Route exact path="/affiliates" component={Affiliates} />
-                <Route exact path="/battles/:battleId" component={BattlePage} />
-                <Route exact path="/battles" component={Battles} />
-                <Route exact path="/blackjack" component={Blackjack} />
-                <Route exact path="/upgrader" component={Upgrader} />
-                <Route exact path="/cases" component={Cases} />
-                <Route exact path="/leaderboard" component={Leaderboard} />
-                <Route exact path="/cases/:caseSlug" component={CasePage} />
-                <Route exact path="/roulette" component={Roulette} />
-                <Route exact path="/crash" component={Crash} />
-                <Route exact path="/marketplace" component={Marketplace} />
-                <Route exact path="/mines" component={Mines} />
-                <Route exact path="/slots" component={Slots} />
-                <Route exact path="/slots/:identifier2" component={SlotDetail} />
-                <Route exact path="/home" component={Home} />
-                <Route exact path="/provably-fair" component={Provablyfair} />
-                <Route exact path="/profile" component={Profile} />
-                <Route exact path="/banned" component={Banned} />
-                <Route exact path="/a/:affiliateCode" component={AffiliatesRedirect} />
-                <Route exact path="/login/:provider?" component={Login} />
-                <Route path="*" component={NotFound} />
-              </Switch>
-            </Content>
+            <ContentWrapper>
+              <Routes>
+                <Route path="/" element={<Navigate to="/home" replace />} />
+                <Route path="/home" element={<Home />} />
+                <Route path="/affiliates" element={<Affiliates />} />
+                <Route path="/battles/:battleId" element={<BattlePage />} />
+                <Route path="/battles" element={<Battles />} />
+                <Route path="/blackjack" element={<Blackjack />} />
+                <Route path="/upgrader" element={<Upgrader />} />
+                <Route path="/cases" element={<Cases />} />
+                <Route path="/leaderboard" element={<Leaderboard />} />
+                <Route path="/cases/:caseSlug" element={<CasePage />} />
+                <Route path="/roulette" element={<Roulette />} />
+                <Route path="/crash" element={<Crash />} />
+                <Route path="/marketplace" element={<Marketplace />} />
+                <Route path="/mines" element={<Mines />} />
+                <Route path="/slots" element={<Slots />} />
+                <Route path="/slots/:identifier2" element={<SlotDetail />} />
+                <Route path="/provably-fair" element={<Provablyfair />} />
+                <Route path="/profile" element={<Profile />} />
+                <Route path="/banned" element={<Banned />} />
+                <Route path="/a/:affiliateCode" element={<AffiliatesRedirect />} />
+                <Route path="/login/:provider?" element={<Login />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </ContentWrapper>
 
-            {isChatVisible && (
+            {chatVisible && (
               <Drawer
                 variant="permanent"
-                PaperProps={{ sx: drawerStyles.drawerPaperFull }}
-                open={open}
+                PaperProps={{ sx: drawerStyles.full }}
               >
                 <Chat />
               </Drawer>
             )}
-          </Body>
-        </Root>
+          </MainBody>
+        </RootContainer>
       </Router>
     </Provider>
   );
