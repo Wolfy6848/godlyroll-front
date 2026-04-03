@@ -1,38 +1,15 @@
 import React from "react";
-import { Typography, Box, Button } from "@mui/material";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
+import NotFoundImage from "../../assets/notfound.svg"; // keep your original image import
 
 const NotFound = () => {
-  const navigate = useNavigate();
-
   return (
-    <Box
-      sx={{
-        height: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
-        backgroundColor: "#0E0F15",
-        color: "white",
-        textAlign: "center",
-        px: 2,
-      }}
-    >
-      <Typography variant="h1" sx={{ fontSize: 100, fontWeight: "bold" }}>
-        404
-      </Typography>
-      <Typography variant="h5" sx={{ mb: 3 }}>
-        Page Not Found
-      </Typography>
-      <Button
-        variant="contained"
-        color="primary"
-        onClick={() => navigate("/home")}
-      >
-        Go Home
-      </Button>
-    </Box>
+    <div className="not-found">
+      <img src={NotFoundImage} alt="Page Not Found" style={{ maxWidth: 400, marginBottom: 20 }} />
+      <h1>404 - Page Not Found</h1>
+      <p>Sorry, the page you are looking for does not exist.</p>
+      <Link to="/home">Go Home</Link>
+    </div>
   );
 };
 
