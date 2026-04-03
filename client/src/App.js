@@ -5,7 +5,7 @@ import {
   Route,
   Redirect,
 } from "react-router-dom";
-import CssBaseline from "@material-ui/core/CssBaseline";
+import CssBaseline from '@mui/material/CssBaseline';
 import { getSiteSchema } from "./services/api.service";
 import { makeStyles } from "@material-ui/core/styles";
 import { Provider } from "react-redux";
