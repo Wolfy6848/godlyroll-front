@@ -11,7 +11,6 @@ import { makeStyles } from "@material-ui/core/styles";
 import { Provider } from "react-redux";
 import store from "./store";
 import { loadUser } from "./actions/auth";
-import { ToastProvider } from "react-toast-notifications";
 import EventHandler from "./EventHandler";
 import { motion } from "framer-motion";
 import BackgroundImage from './assets/background.png'
