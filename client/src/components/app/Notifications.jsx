@@ -1,22 +1,13 @@
-import { toast } from "react-hot-toast";
+import React from "react";
+import ToastIcon from "../../assets/toast-icon.svg"; // toast notification icon
 
-export const notifySuccess = (message) => {
-  toast.success(message, {
-    position: "bottom-left",
-    duration: 4500,
-  });
+const Notifications = ({ message, type }) => {
+  return (
+    <div className={`notification ${type}`}>
+      <img src={ToastIcon} alt="Notification" style={{ marginRight: 10 }} />
+      <span>{message}</span>
+    </div>
+  );
 };
 
-export const notifyError = (message) => {
-  toast.error(message, {
-    position: "bottom-left",
-    duration: 4500,
-  });
-};
-
-export const notifyInfo = (message) => {
-  toast(message, {
-    position: "bottom-left",
-    duration: 4500,
-  });
-};
+export default Notifications;
