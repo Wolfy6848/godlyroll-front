@@ -2,7 +2,6 @@ import PropTypes from "prop-types";
 import { useEffect } from "react";
 import { withRouter } from "react-router-dom";
 import { connect } from "react-redux";
-import { useToasts } from "react-toast-notifications";
 import { changeWallet } from "./actions/auth";
 import { sockets } from "./services/websocket.service";
 
