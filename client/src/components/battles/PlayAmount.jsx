@@ -1,39 +1,38 @@
+import React, { useState } from "react";
+import { Box, Button, TextField, Typography } from "@mui/material";
 
-import React, { useState, useEffect } from "react";
-import { battlesSocket } from "../../services/websocket.service";
-import { getActiveBattlesGame } from "../../services/api.service";
-import parseCommasToThousands from "../../utils/parseCommasToThousands";
-import coin from "../../assets/icons/coin.svg";
+const PlayAmount = ({ maxAmount, onPlay }) => {
+  const [amount, setAmount] = useState("");
 
-export const PlayAmount = () => {
-  const [playAmount, setPlayAmount] = useState(0);
-
-  // Fetch battles schema from API
-  const fetchData = async () => {
-    try {
-      const schema = await getActiveBattlesGame();
-
-      setPlayAmount(schema.reduce((a, b) => a + b.price, 0));
-    } catch (error) {
-      console.log("There was an error while loading battles schema:", error);
-    }
+  const handlePlay = () => {
+    const numericAmount = parseFloat(amount);
+    if (!numericAmount || numericAmount <= 0 || numericAmount > maxAmount) return;
+    onPlay(numericAmount);
   };
 
-  useEffect(() => {
-    fetchData();
-
-    battlesSocket.on("battles:new", fetchData);
-    battlesSocket.on("battles:finished", fetchData);
-
-    return () => {
-      battlesSocket.off("battles:new", fetchData);
-      battlesSocket.off("battles:finished", fetchData);
-    };
-  });
-
   return (
-    <div style={{ color: "#9E9FBD", fontSize: "10px", margin: "auto", marginLeft: "0px", display: "flex", alignItems: "center", gap: "0.25rem" }}>
-      <img src={coin} style={{ height: 10, width: 10}} /> {parseCommasToThousands(parseFloat(playAmount))}
-    </div>
+    <Box sx={{ p: 2, maxWidth: 400, margin: "auto" }}>
+      <Typography variant="h6" gutterBottom>Enter Amount to Play</Typography>
+      <TextField
+        fullWidth
+        type="number"
+        label={`Amount (max ${maxAmount})`}
+        value={amount}
+        onChange={(e) => setAmount(e.target.value)}
+        inputProps={{ min: 0, max: maxAmount }}
+        margin="normal"
+      />
+      <Button
+        variant="contained"
+        color="primary"
+        onClick={handlePlay}
+        disabled={!amount || parseFloat(amount) <= 0 || parseFloat(amount) > maxAmount}
+        fullWidth
+      >
+        Play
+      </Button>
+    </Box>
   );
 };
+
+export default PlayAmount;
